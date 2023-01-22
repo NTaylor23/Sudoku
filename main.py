@@ -8,9 +8,14 @@ import traceback
 IN_PATH = 'images/easy.png'
 OUT_PATH = 'images/sample.jpeg'
 
+# numpy array to read the interpreted digits from the input image
 grid: np.array = np.zeros((9, 9), dtype=np.uint8)
+
+# python list to hold the interpreted digits for reference when the solved image is created
 original_state = []
 
+# check each row, column and 3x3 square for the current number n
+# this is done each iteration during the backtracking algorithm
 def possible(y: int, x: int, n: int) -> bool:
     global grid
     
@@ -35,7 +40,8 @@ def possible(y: int, x: int, n: int) -> bool:
                      
     return True
 
-def solve():
+# recursive backtracking
+def solve() -> None:
     global grid
     for y in range(9):
         for x in range(9):
@@ -47,21 +53,27 @@ def solve():
                         grid[y][x] = 0
                 return
     create_image(grid)
-    
-def create_image(solved):
+
+
+def create_image(solved) -> None:
     try:
+        # configure image for output
         out = Image.open(IN_PATH)
         w, h = out.size
+        # image should technically be a square, this is for simplicity
         sub_w, sub_h = w // 9, h // 9
-        print(sub_w, sub_h)
-        # get a drawing context
-        d = ImageDraw.Draw(out)
 
+        # image setup
+        d = ImageDraw.Draw(out)
+        ft = ImageFont.truetype("assets/GothamMedium.ttf", 24)
+        
         for y in range(9):
             for x in range(9):
                 if original_state[y][x] == '':
-                    d.multiline_text(((sub_w * x) + sub_w // 2, (sub_h * y) + sub_h // 2), str(solved[y][x]), fill=(0, 0, 0))
+                    # add text on squares where no information was present in the original image
+                    d.text(((sub_w * x) + sub_w // 2, (sub_h * y) + sub_h // 2), str(solved[y][x]), font=ft, fill=(255, 0, 0))
         out.show()
+        
     except Exception as e:
         print(e, traceback.format_exc())
     
@@ -75,6 +87,8 @@ def main() -> None:
         for row in range(9):
             r = []
             for col in range(9):
+                # traverse the image square by square, and do OCR on each square
+                # this is quite slow, and needs to be optimized - current runtime about 3s
                 num = pt.image_to_string(img[10 + row * 100:(row + 1) * 100 - 10, 10 + col * 100:(col + 1) * 100 - 10, :], 
                                          config='--psm 6 --oem 1 -c tessedit_char_whitelist=0123456789')
                 if num:
@@ -84,8 +98,6 @@ def main() -> None:
     except Exception as e:
         print(e)
         
-    print('Solved:')
     solve()
-
     
 main()
