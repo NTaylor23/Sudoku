@@ -1,4 +1,4 @@
-# A second foray into Computer Vision
+# Sudoku
 
 For as long as I can remember, I've been fascinated by Sudoku. I have family members who can play it for hours, uninterrupted, and claim it's the undisputed king of brain games. 
 
