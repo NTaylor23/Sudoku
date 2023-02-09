@@ -15,7 +15,8 @@ image = cv2.resize(image, None, fx= 0.3, fy= 0.3, interpolation= cv2.INTER_LINEA
 gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
 
 h, w, _ = image.shape
-print(h, w)
+
+
 
 processed = blur_and_thresh(gray)
 contours, _ = cv2.findContours(processed, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
