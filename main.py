@@ -5,7 +5,7 @@ import numpy as np
 import pytesseract as pt
 import traceback
 
-IN_PATH = 'images/easy.png'
+IN_PATH = 'images/perspective.jpg'
 OUT_PATH = 'images/sample.jpeg'
 
 # numpy array to read the interpreted digits from the input image
@@ -52,10 +52,12 @@ def solve() -> None:
                         solve()
                         grid[y][x] = 0
                 return
+    print('Returning...')
     create_image(grid)
 
 
 def create_image(solved) -> None:
+    print('reached!')
     try:
         # configure image for output
         out = Image.open(IN_PATH)
@@ -83,21 +85,30 @@ def main() -> None:
     try:
         img = cv2.imread(IN_PATH)
         img = cv2.resize(img, (900, 900))
+        blurred = cv2.blur(img, (5, 5))
+        
+        (T, threshed) = cv2.threshold(blurred, 200, 255, cv2.THRESH_BINARY)
+        
+        # cv2.imshow('img', img)
+        # cv2.waitKey(0)
+        # cv2.destroyAllWindows()
         
         for row in range(9):
             r = []
             for col in range(9):
                 # traverse the image square by square, and do OCR on each square
                 # this is quite slow, and needs to be optimized - current runtime about 3s
-                num = pt.image_to_string(img[10 + row * 100:(row + 1) * 100 - 10, 10 + col * 100:(col + 1) * 100 - 10, :], 
+                num = pt.image_to_string(threshed[10 + row * 100:(row + 1) * 100 - 10, 10 + col * 100:(col + 1) * 100 - 10, :], 
                                          config='--psm 6 --oem 1 -c tessedit_char_whitelist=0123456789')
+                print(num)
                 if num:
                     grid[row, col] = num
                 r.append(num)
             original_state.append(r)
     except Exception as e:
-        print(e)
-        
-    solve()
+        print(e, traceback.format_exc())
+    print(grid)
+    # UNCOMMENT THIS ONCE OCR WORKS...
+    # solve()
     
 main()

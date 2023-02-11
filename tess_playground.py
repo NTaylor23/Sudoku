@@ -1,6 +1,5 @@
 import cv2
 import numpy as np
-import pytesseract as pt
 
 def blur_and_thresh(img):
     blur = cv2.GaussianBlur(img, (5,5), 0)
@@ -15,8 +14,6 @@ image = cv2.resize(image, None, fx= 0.3, fy= 0.3, interpolation= cv2.INTER_LINEA
 gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
 
 h, w, _ = image.shape
-
-
 
 processed = blur_and_thresh(gray)
 contours, _ = cv2.findContours(processed, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
@@ -67,6 +64,7 @@ P = cv2.warpPerspective(gray, perspective, (w, h))
 
 P = cv2.resize(P, (900, 900))
 cv2.imshow("perspective", P)
+cv2.imwrite('images/perspective.jpg', P)
 
 cv2.waitKey(0)
 cv2.destroyAllWindows
