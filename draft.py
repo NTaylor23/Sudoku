@@ -5,6 +5,8 @@ import numpy as np
 import pytesseract as pt
 import traceback
 
+from solve import *
+
 IN_PATH = 'images/perspective.jpg'
 OUT_PATH = 'images/sample.jpeg'
 
