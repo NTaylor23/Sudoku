@@ -1,51 +1,72 @@
 import cv2
+import numpy as np
 
-cap = cv2.VideoCapture(0)
-best_frame = None 
+class Webcam:
+    def __init__(self) -> None:
+        self.cap = cv2.VideoCapture(0)
+        self.cap.set(3, 640)
+        self.cap.set(4, 480)
+        self.best_frame = None 
+        self.final_contour = None
 
-def blur_and_thresh(img):
-    blur = cv2.GaussianBlur(img, (5,5), 0)
-    return cv2.adaptiveThreshold(blur, 255, 1, 1, 11, 2)
+    def read_frame(self, image: np.ndarray) -> bool:
+        """ Process an image frame and attempt to locate a square representing a Sudoku board.
+        This is implemented by finding the largest contiguous square in the frame and calculating its area.
 
-def read(image):
-    gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
+        Args:
+            image (np.ndarray): The current image frame.
+            
+        Returns:
+            bool: True if a viable candidate is found, False otherwise.
+        """
+        gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
+        canny = cv2.Canny(gray, 50, 50)
+        contours, _ = cv2.findContours(canny, cv2.RETR_TREE, cv2.CHAIN_APPROX_NONE)
 
-    processed = blur_and_thresh(gray)
-    contours, _ = cv2.findContours(processed, cv2.RETR_TREE, cv2.CHAIN_APPROX_NONE)
+        max_area = 0
 
-    max_area = 0
-
-    for contour in contours:
-        area = cv2.contourArea(contour)
-        if area > max_area:
-            max_area = area
-            best_contour = contour
-            approx = cv2.approxPolyDP(best_contour, 0.01 * cv2.arcLength(best_contour, True), True)
-            if len(approx) == 4:
-                x, y, w, h = cv2.boundingRect(best_contour)
-                ratio = float(w) / h
-                if ratio >= 0.97 and w * h > 100000:
-                    return True
+        for contour in contours:
+            area = cv2.contourArea(contour)
+            if area > max_area:
+                max_area = area
+                best_contour = contour
+                approx = cv2.approxPolyDP(best_contour, 0.01 * cv2.arcLength(best_contour, True), True)
                 
-    image = cv2.drawContours(image, best_contour, -1, (0, 255, 0), 4)
-    cv2.imshow("webcam", image)
+                if len(approx) == 4:
+                    x, y, w, h = cv2.boundingRect(best_contour)
+                    ratio = float(w) / h
+                    
+                    if (ratio >= 0.96 and ratio <= 1.1) and w * h > 100000:
+                        self.final_contour = best_contour
+                        return True
+                    
+                    cv2.drawContours(image, best_contour, -1, (0, 0, 255), 4)
+                    
+        cv2.imshow("webcam", image)
 
-while True:
-    _, frame = cap.read()
-    
-    if read(frame):
-        best_frame = frame
-        break
-    
-    key = cv2.waitKey(5)
-    
-    if key == 27:
-        break
-    
-cap.release()
+    def get_puzzle_area(self) -> tuple:
+        """ Read webcam input frame by frame until a Sudoku board is found.
 
-# debug
-cv2.imshow('Best frame', best_frame) 
-cv2.waitKey(0)
-cv2.destroyAllWindows()
-# /debug
+        Returns:
+            tuple: (Board contour, frame containing best image of board)
+        """
+        while True:
+            _, frame = self.cap.read()
+                
+            if self.read_frame(frame):
+                self.best_frame = frame
+                break
+            
+            if cv2.waitKey(1) & 0xFF ==ord("q"):
+                break
+
+        self.cap.release()
+        # debug
+        cv2.drawContours(self.best_frame, self.final_contour, -1, (0, 225, 0), 4)
+        cv2.imshow('Best frame', self.best_frame) 
+        cv2.waitKey(0)
+        cv2.destroyAllWindows()
+        # /debug
+        return (self.final_contour, self.best_frame)
+            
+        
