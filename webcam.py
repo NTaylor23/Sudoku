@@ -62,8 +62,9 @@ class Webcam:
 
         self.cap.release()
         # debug
-        cv2.drawContours(self.best_frame, self.final_contour, -1, (0, 225, 0), 4)
-        cv2.imshow('Best frame', self.best_frame) 
+        frame_copy = self.best_frame.copy()
+        cv2.drawContours(frame_copy, self.final_contour, -1, (0, 225, 0), 4)
+        cv2.imshow('Best frame', frame_copy) 
         cv2.waitKey(0)
         cv2.destroyAllWindows()
         # /debug

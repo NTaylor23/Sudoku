@@ -6,7 +6,7 @@ class Solver:
 
     def start(self):
         self.solve(self.board)
-        self.print_board(self.board)
+        return self.board
         
     def solve(self, board):
         find = self.find_empty(board)
