@@ -13,13 +13,15 @@ class OCR:
         self.img = cv2.resize(img, (900, 900))
         self.original_state = [[0 for _ in range(9)] for _ in range(9)]
         self.grid = np.zeros((9, 9), dtype=np.uint8)
-        self.tess_path = '/opt/homebrew/Cellar/tesseract/5.3.0_1/share/tessdata/.'
+        self.tess_path = '/usr/local/Cellar/tesseract/5.2.0/share/tessdata/.'
     
     def read_numbers(self):
-        blurred = cv2.blur(self.img, (4, 4))
-        _, threshed = cv2.threshold(blurred, 100, 255, cv2.THRESH_BINARY)
-        
-        threshed = cv2.cvtColor(threshed, cv2.COLOR_BGR2GRAY)
+        blurred = cv2.blur(self.img, (1, 1))
+        gray = cv2.cvtColor(blurred, cv2.COLOR_BGR2GRAY)
+        threshed = cv2.adaptiveThreshold(gray, 255, cv2.ADAPTIVE_THRESH_GAUSSIAN_C, cv2.THRESH_BINARY, 115, 1)
+        cv2.imshow('threshed', threshed)
+        cv2.waitKey(0)
+        cv2.destroyAllWindows()
 
         with PyTessBaseAPI(lang='eng', path=self.tess_path, psm=10) as api:
             api.SetVariable('tessedit_char_whitelist', digits)
