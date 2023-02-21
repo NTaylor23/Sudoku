@@ -18,6 +18,7 @@ class Webcam:
         Returns:
             bool: True if a viable candidate is found, False otherwise.
         """
+        webcam_capture_area = image.shape[0] * image.shape[1]
         gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
         canny = cv2.Canny(gray, 50, 50)
         contours, _ = cv2.findContours(canny, cv2.RETR_TREE, cv2.CHAIN_APPROX_NONE)
@@ -35,7 +36,7 @@ class Webcam:
                     x, y, w, h = cv2.boundingRect(best_contour)
                     ratio = float(w) / h
                     
-                    if (ratio >= 0.96 and ratio <= 1.1) and w * h > 100000:
+                    if (ratio >= 0.98 and ratio <= 1.1) and w * h > (webcam_capture_area // 2):
                         self.final_contour = best_contour
                         return True
                     
@@ -49,7 +50,7 @@ class Webcam:
         Returns:
             tuple: (Board contour, frame containing best image of board)
         """
-        
+        valid_frame_count = 0
         while True:
             _, frame = self.cap.read()
                 
