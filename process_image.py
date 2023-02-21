@@ -9,6 +9,12 @@ class ProcessImage:
         self.top_left = self.top_right = self.bottom_left = self.bottom_right = np.float32([0, 0])
         self.original_dimensions = np.float32([[0, 0], [self.w, 0], [0, self.h], [self.w, self.h]])
 
+    def noise_removal(self, img):
+        kernel = np.ones((1, 1), np.uint8)
+        img = cv2.morphologyEx(img, cv2.MORPH_CLOSE, kernel)
+        img = cv2.medianBlur(img, 5)
+        return (img)
+        
     def warp_perspective(self):
         # Approximate the contour with a polygonal curve 
         approx = cv2.approxPolyDP(self.contour, 0.05 * cv2.arcLength(self.contour, True), True)
@@ -32,5 +38,9 @@ class ProcessImage:
             
         perspective = cv2.getPerspectiveTransform(puzzle_corners, self.original_dimensions)
         cropped = cv2.warpPerspective(self.frame, perspective, (self.w, self.h))
-        return cv2.resize(cropped, (900, 900))
+        dst = cv2.fastNlMeansDenoisingColored(cropped, None, 15, 15, 7, 21)
+        gray = cv2.cvtColor(dst, cv2.COLOR_BGR2GRAY)
+        threshed = cv2.adaptiveThreshold(gray, 255, cv2.ADAPTIVE_THRESH_GAUSSIAN_C, cv2.THRESH_BINARY, 11,2)
+        noise_removed = self.noise_removal(threshed)
+        return (cv2.resize(cropped, (900, 900)), cv2.resize(noise_removed, (900, 900)))
         

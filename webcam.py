@@ -1,11 +1,10 @@
 import cv2
 import numpy as np
+from util import show_image
 
 class Webcam:
     def __init__(self) -> None:
         self.cap = cv2.VideoCapture(0)
-        self.cap.set(3, 640)
-        self.cap.set(4, 480)
         self.best_frame = None 
         self.final_contour = None
 
@@ -50,6 +49,7 @@ class Webcam:
         Returns:
             tuple: (Board contour, frame containing best image of board)
         """
+        
         while True:
             _, frame = self.cap.read()
                 
@@ -61,13 +61,16 @@ class Webcam:
                 break
 
         self.cap.release()
+        
         # debug
         frame_copy = self.best_frame.copy()
         cv2.drawContours(frame_copy, self.final_contour, -1, (0, 225, 0), 4)
-        cv2.imshow('Best frame', frame_copy) 
-        cv2.waitKey(0)
-        cv2.destroyAllWindows()
+        show_image('Best Frame', frame_copy)
         # /debug
+        
         return (self.final_contour, self.best_frame)
             
         
+if __name__ == '__main__':
+    W = Webcam()
+    W.get_puzzle_area()

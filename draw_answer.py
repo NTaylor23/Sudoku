@@ -20,7 +20,7 @@ class DrawAnswer:
             # image setup
             d = ImageDraw.Draw(out)
             ft = ImageFont.truetype("assets/GothamMedium.ttf", 48)
-            print('loop reached')
+            
             for y in range(9):
                 for x in range(9):
                     if self.original_state[y][x] == 0:
@@ -28,7 +28,10 @@ class DrawAnswer:
                         
             result = cv2.cvtColor(np.array(out), cv2.COLOR_RGB2BGR)
             result = cv2.resize(result, (400, 400))
+            print('Complete.')
             cv2.imshow("Result", result)
+            cv2.waitKey(0)
+            cv2.destroyAllWindows()
             
             
         except Exception as e:

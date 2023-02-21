@@ -4,11 +4,43 @@ class Solver:
     def __init__(self, board: np.array) -> None:
         self.board = board
 
-    def start(self):
-        self.solve(self.board)
-        return self.board
+    def start(self) -> any:
+        if self.verify_sudoku_board(self.board):
+            self.solve(self.board)
+            return self.board
+        else:
+            return None
+    
+    def contains_duplicate(self, row: list) -> bool:
+        """ Check if the row contains a duplicate number, not including 0s."""
+        row = list(row)
+        for i in range(1, 10):
+            if row.count(i) > 1:
+                return False
+        return True
+    
+    def verify_sudoku_board(self, board) -> bool:
+        # Check rows
+        for row in board:
+            if not self.contains_duplicate(row):
+                return False
+
+        # Check columns
+        for col in range(9):
+            if not self.contains_duplicate([row[col] for row in board]):
+                return False
+
+        # Check squares
+        for row in range(3):
+            for col in range(3):
+                square = [board[row*3 + i][col*3 + j] for i in range(3) for j in range(3)]
+                if not self.contains_duplicate(square):
+                    return False
+
+        return True
         
-    def solve(self, board):
+        
+    def solve(self, board) -> bool:
         find = self.find_empty(board)
         
         if not find:
@@ -49,20 +81,6 @@ class Solver:
 
         return True
     
-    def print_board(self, board):
-        for i in range(len(board)):
-            if i % 3 == 0 and i != 0:
-                print("- - - - - - - - - - - - - ")
-
-            for j in range(len(board[0])):
-                if j % 3 == 0 and j != 0:
-                    print(" | ", end="")
-
-                if j == 8:
-                    print(board[i][j])
-                else:
-                    print(str(board[i][j]) + " ", end="")
-                    
     def find_empty(self, board):
         for i in range(len(board)):
             for j in range(len(board[0])):
