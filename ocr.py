@@ -10,12 +10,11 @@ class OCR:
     
     def __init__(self, img) -> None:
         self.img = img
-        self.original_state = [[0 for _ in range(9)] for _ in range(9)]
         self.grid = np.zeros((9, 9), dtype=np.uint8)
     
     def read_numbers(self):
         
-        show_image('what the ocr sees', self.img)
+        #show_image(self.img, 'what the ocr sees')
 
         with PyTessBaseAPI(lang='eng', psm=10) as api:
             api.SetVariable('tessedit_char_whitelist', digits[1:])
@@ -28,7 +27,6 @@ class OCR:
                     txt = api.GetUTF8Text().replace('\n', '')
                     if txt:
                         self.grid[row, col] = int(txt)
-                self.original_state.append(r)
         
         return self.grid
         

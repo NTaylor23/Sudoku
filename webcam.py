@@ -65,7 +65,8 @@ class Webcam:
         # debug
         frame_copy = self.best_frame.copy()
         cv2.drawContours(frame_copy, self.final_contour, -1, (0, 225, 0), 4)
-        show_image('Best Frame', frame_copy)
+        show_image(frame_copy, 'Best Frame')
+        print('Best frame dimensions:', self.best_frame.shape)
         # /debug
         
         return (self.final_contour, self.best_frame)

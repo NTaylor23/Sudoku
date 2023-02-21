@@ -29,6 +29,7 @@ class DrawAnswer:
             result = cv2.cvtColor(np.array(out), cv2.COLOR_RGB2BGR)
             result = cv2.resize(result, (400, 400))
             print('Complete.')
+            cv2.destroyAllWindows()
             cv2.imshow("Result", result)
             cv2.waitKey(0)
             cv2.destroyAllWindows()
