@@ -2,8 +2,6 @@ from PIL import Image
 from string import digits
 from tesserocr import PyTessBaseAPI
 from util import show_image
-
-import cv2
 import numpy as np
 
 class OCR:
@@ -13,7 +11,7 @@ class OCR:
         self.grid = np.zeros((9, 9), dtype=np.uint8)
         self.debug = debug
         
-    def get_most_frequent_element(self, number_string):
+    def get_most_frequent_element(self, number_string) -> int:
         indices, max, choice = [0] * 10, 0, 0
         
         for num in number_string:
@@ -27,7 +25,22 @@ class OCR:
         return choice
         
     def reassess_number(self, img):
+        """ In an OCR program, occasionally, the accuracy of classifying a single character
+        can be greatly improved if the OCR receives line containing more than one instance
+        of that character, e.g. [11111] as opposed to [1].
         
+        This program duplicates an image five times, horizontally, and then re-reads the
+        image to attempt to get a more accurate classification.
+        
+        This function should only be called if the confidence interval of a given image
+        is less than 0.80.
+
+        Args:
+            img: the image to be re-drawn and re-read
+
+        Returns:
+            int: the best possible choice for that image after being re-drawn
+        """
         with PyTessBaseAPI(lang='eng', psm=7) as api:
             api.SetVariable('tessedit_char_whitelist', digits[1:])
             
@@ -46,7 +59,10 @@ class OCR:
             string = api.GetUTF8Text().strip()
             return self.get_most_frequent_element(string)
     
-    def read_numbers(self):
+    def read_numbers(self) -> np.array:
+        """ Read all of the 81 squares on the board individually and populate
+        a numpy array with the best number classification for each one (0 if blank)
+        """
         
         if self.debug:
             show_image(self.img, 'Binary Thresh')
