@@ -5,6 +5,7 @@ class Solver:
         self.board = board
 
     def start(self) -> any:
+        """Verify that the board is valid, and then proceed to solve."""
         if self.verify_sudoku_board(self.board):
             self.solve(self.board)
             return self.board
@@ -41,6 +42,7 @@ class Solver:
         
         
     def solve(self, board) -> bool:
+        """Recursively check each possible match and accumulate towards a solution."""
         find = self.find_empty(board)
         
         if not find:
@@ -82,6 +84,7 @@ class Solver:
         return True
     
     def find_empty(self, board):
+        """Find the next empty square."""
         for i in range(len(board)):
             for j in range(len(board[0])):
                 if board[i][j] == 0:

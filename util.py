@@ -6,7 +6,6 @@ def show_image(image, name='image'):
     cv2.destroyAllWindows()
 
 
-
 def print_confidence_values(confidence_values):
     print('[Numeric Value : Confidence Rating From Tesseract')
     for line in confidence_values:
