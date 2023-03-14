@@ -10,4 +10,5 @@ The algorithm that solves the Sudoku puzzle is basic recursive backtracking, but
 - Use a machine learning library like Keras to read handwritten text on a partially complete puzzle.
 
 ## In Action:
-<img src="assets/result.png" width="50%" height="50%" />
+https://user-images.githubusercontent.com/87832581/225162372-6f9c0483-77e1-4dda-9a9b-02fb4a0996a4.mov
+
