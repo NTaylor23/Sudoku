@@ -41,7 +41,7 @@ class OCR:
                 new_image.paste(cropped, (x_offset, 0))
                 x_offset += w
                 
-            #new_image.show()
+            new_image.show()
             api.SetImage(new_image)
             string = api.GetUTF8Text().strip()
             return self.get_most_frequent_element(string)
